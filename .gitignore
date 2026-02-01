@@ -2,6 +2,7 @@
 *.log
 # generated_tools.py
 */venv
+venv
 *.pyc
 cookies_template.json
 gen_log.txt
