@@ -1,0 +1,8 @@
+.env
+*.log
+# generated_tools.py
+*/venv
+*.pyc
+cookies_template.json
+gen_log.txt
+session.json
