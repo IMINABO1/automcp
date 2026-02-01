@@ -10,3 +10,9 @@ COOKIES_FILE = os.path.join(BASE_DIR, "cookies.json")
 SESSION_FILE = os.path.join(BASE_DIR, "session.json")
 EVENTS_LOG = os.path.join(BASE_DIR, "test_events.json")
 GENERATED_TOOLS_FILE = os.path.join(BASE_DIR, "generated_tools.py")
+
+
+IBM_WATSONX_URL = os.getenv("IBM_WATSONX_URL")
+IBM_API_KEY = os.getenv("IBM_API_KEY")
+IBM_PROJECT_ID = os.getenv("IBM_PROJECT_ID")
+IBM_MODEL_ID = "ibm/granite-4-h-small"
