@@ -1,4 +1,4 @@
-# 🚀 Project Blueprint: AutoMCP (Powered by IBM Granite)
+# 🚀 Project Blueprint: AutoMCP (Powered by IBM watsonx Orchestrate)
 
 **Event:** IBM Dev Day: AI Demystified Hackathon
 
@@ -11,10 +11,9 @@
 ## 1. The Core Idea (The Pitch)
 
 **The Problem:**
-To give AI Agents "hands," developers currently have to manually read thousands of pages of API documentation (Swagger/OpenAPI) and write boilerplate code for every single function. It takes days to onboard a single app like Trello or Linear.
+Developers currently have to manually read thousands of pages of API documentation (Swagger/OpenAPI) and write boilerplate code for every single function.  
+It takes days to create MCP support for a single app like Trello or Linear.
 
 **The Solution:**
-**AutoMCP** is an autonomous "Tool Factory." It ingests raw API Documentation (via URL or file), intelligently selects the most useful endpoints, and uses **IBM Granite** to compile a fully validated **MCP (Model Context Protocol)** Server in seconds.
-
-**The "Secondary" Feature (The Backup):**
-For apps with *no* documentation, we include **"Ghost Mode"** (Chrome Extension) to capture network traffic and generate tools from user actions.
+**AutoMCP** is an autonomous Tool Factory.
+It intelligently selects the most useful endpoints from a page, mapping user generated input to actions, and uses **IBM watsonx Orchestrate** to compile a fully validated **MCP (Model Context Protocol)** server in seconds.
