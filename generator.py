@@ -78,7 +78,7 @@ def generate_tool_code(event):
 
     try:
         response = client.models.generate_content(
-            model='gemini-3-flash-preview',
+            model='models/gemini-3-flash-preview',
             contents=prompt
         )
         code = response.text.replace("```python", "").replace("```", "").strip()

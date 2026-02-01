@@ -225,7 +225,7 @@ Return ONLY a JSON object:
 
     try:
         response = client.models.generate_content(
-            model='gemini-3-flash-preview',  # Fast model for real-time analysis
+            model='models/gemini-3-flash-preview',  # Fast model for real-time analysis
             contents=[prompt]
         )
         text = response.text.strip()
