@@ -1,15 +1,9 @@
-from google import genai
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import re
 import config
-
-# Configure Gemini
-if not config.GOOGLE_API_KEY:
-    print("Warning: GOOGLE_API_KEY not found in environment.")
-
-client = genai.Client(api_key=config.GOOGLE_API_KEY)
+from ask_watson import ask_watson
 
 
 def generate_tool_code(event):
@@ -77,11 +71,8 @@ def generate_tool_code(event):
     """
 
     try:
-        response = client.models.generate_content(
-            model='gemini-3-flash-preview',
-            contents=prompt
-        )
-        code = response.text.replace("```python", "").replace("```", "").strip()
+        response = ask_watson(prompt)
+        code = response.replace("```python", "").replace("```", "").strip()
         return code
     except Exception as e:
         log(f"Error generating code: {e}")

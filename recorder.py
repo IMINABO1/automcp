@@ -6,12 +6,8 @@ from getpass import getpass
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import pyperclip
 from playwright.sync_api import sync_playwright
-from google import genai
-from google.genai import types
 import config
-
-# Configure Gemini
-client = genai.Client(api_key=config.GOOGLE_API_KEY)
+from ask_watson import ask_watson
 
 SESSION_FILE = "session.json"
 
@@ -224,11 +220,8 @@ Return ONLY a JSON object:
 """
 
     try:
-        response = client.models.generate_content(
-            model='gemini-3-flash-preview',  # Fast model for real-time analysis
-            contents=[prompt]
-        )
-        text = response.text.strip()
+        response = ask_watson(prompt)
+        text = response.strip()
         if text.startswith("```json"):
             text = text[7:]
         if text.endswith("```"):
@@ -238,58 +231,24 @@ Return ONLY a JSON object:
         return None
 
 
-def analyze_page_with_gemini(screenshot_bytes):
-    """Sends screenshot to Gemini and asks for login fields."""
-
-    prompt = """
-    Analyze this login screen. identifying the following elements if present:
-    1. Email/Username input field selector (CSS or descriptive)
-    2. Password input field selector
-    3. Primary 'Log In', 'Continue', 'Next', or 'Sign In' button selector
-    4. 'Accept Cookies' button selector
-    5. '2FA' or 'OTP' input code field. **IMPORTANT: PROMISE TO BE GENERIC.**  
-       - If there is a single input box, just return "input". 
-       - If there are multiple inputs for digits, return the first one, e.g. "input:first-of-type" or simply "input".
-       - AVOID overly specific classes like ".css-1ndkufm" if a generic "input" or "div > input" is sufficient and unique enough in that context.
-    6. Indicator if the user is ALREADY logged in (e.g. dashboard, avatar).
-
-    Return ONLY a JSON object with keys:
-    {
-        "email_selector": "...",
-        "password_selector": "...",
-        "primary_action_button_selector": "...",
-        "cookie_button_selector": "...",
-        "otp_selector": "...",
-        "is_logged_in": boolean,
-        "step_description": "Brief description of the current step (e.g. 'Enter Email')"
-    }
-    If a field is not present, set it to null.
+def analyze_page_with_ai(screenshot_bytes):
     """
-    # print(f"screenshot_bytes is {screenshot_bytes}")
-    try:
-        response = client.models.generate_content(
-            # model='gemini-2.0-flash-lite-preview-02-05',
-            model='gemini-3-flash-preview',
-            contents=[
-                prompt,
-                types.Part.from_bytes(data=screenshot_bytes, mime_type="image/png")
-            ]
-        )
-    except Exception as e:
-        print(f"Gemini API Error: {e}")
-        return None
-    try:
-        # Clean up code blocks if Gemini returns them
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.endswith("```"):
-            text = text[:-3]
-        return json.loads(text)
-    except Exception as e:
-        print(f"Error parsing Gemini response: {e}")
-        print(f"Raw response: {response.text}")
-        return None
+    Analyzes a page for login fields.
+    Note: Watson does not support image/screenshot analysis.
+    Returns default selectors for common login patterns.
+    """
+    # Watson doesn't support multimodal (image) inputs
+    # Return common selectors as fallback
+    print("Warning: Watson does not support screenshot analysis. Using default selectors.")
+    return {
+        "email_selector": "input[type='email'], input[name='email'], input[name='username']",
+        "password_selector": "input[type='password']",
+        "primary_action_button_selector": "button[type='submit'], input[type='submit']",
+        "cookie_button_selector": None,
+        "otp_selector": "input[type='text']",
+        "is_logged_in": False,
+        "step_description": "Default login selectors (no AI analysis available)"
+    }
 
 def smart_login(page):
     """
@@ -307,7 +266,7 @@ def smart_login(page):
         screenshot = page.screenshot()
         print("Screenshot taken.\nStart analyzing...")
         # Analyze
-        analysis = analyze_page_with_gemini(screenshot)
+        analysis = analyze_page_with_ai(screenshot)
         if not analysis:
             print("Failed to analyze page. Retrying...")
             continue
