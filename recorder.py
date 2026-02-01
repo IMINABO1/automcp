@@ -3,6 +3,7 @@ import time
 import os
 import base64
 from getpass import getpass
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import pyperclip
 from playwright.sync_api import sync_playwright
 from google import genai
@@ -203,9 +204,43 @@ def load_cookies(context, path):
     else:
         print(f"WARNING: Cookies file not found at {path}. You will not be logged in.")
 
+def analyze_network_event(event):
+    """Uses AI to understand what a network request does and returns context."""
+
+    # Skip noisy/unimportant requests
+    url = event.get("url", "")
+    if any(skip in url for skip in ["analytics", "sentry", "batch", "heartbeat", "gasv3"]):
+        return None
+
+    prompt = f"""Analyze this API request and explain its PURPOSE in 1 short sentence.
+Focus on what USER ACTION or DATA this relates to.
+
+Method: {event.get('method')}
+URL: {url}
+Post Data: {event.get('post_data', 'None')[:500] if event.get('post_data') else 'None'}
+
+Return ONLY a JSON object:
+{{"purpose": "Brief description of what this does", "category": "read|write|auth|analytics|other", "useful_for_tool": boolean}}
+"""
+
+    try:
+        response = client.models.generate_content(
+            model='gemini-3-flash-preview',  # Fast model for real-time analysis
+            contents=[prompt]
+        )
+        text = response.text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.endswith("```"):
+            text = text[:-3]
+        return json.loads(text)
+    except Exception as e:
+        return None
+
+
 def analyze_page_with_gemini(screenshot_bytes):
     """Sends screenshot to Gemini and asks for login fields."""
-    
+
     prompt = """
     Analyze this login screen. identifying the following elements if present:
     1. Email/Username input field selector (CSS or descriptive)
@@ -495,12 +530,24 @@ def record():
                         "method": response.request.method,
                         "url": url,
                         "request_headers": response.request.headers,
-                        # "post_data": response.request.post_data, # Use with caution, might be large
                         "status": response.status
                     }
-                    if response.request.post_data:
-                        event["post_data"] = response.request.post_data
-                        
+
+                    # Handle post_data safely - it may be binary/gzip compressed
+                    try:
+                        post_data = response.request.post_data
+                        if post_data:
+                            event["post_data"] = post_data
+                    except Exception:
+                        # If post_data is binary (gzip), try to get raw bytes and base64 encode
+                        try:
+                            post_data_buffer = response.request.post_data_buffer
+                            if post_data_buffer:
+                                event["post_data_base64"] = base64.b64encode(post_data_buffer).decode('ascii')
+                                event["post_data_is_binary"] = True
+                        except Exception:
+                            pass  # Skip post_data if we can't get it at all
+
                     network_events.append(event)
                     print(f"Captured: {event['method']} {event['url']}")
             except Exception as e:
@@ -549,6 +596,45 @@ def record():
         with open(config.EVENTS_LOG, "w") as f:
             json.dump(network_events, f, indent=2)
         print(f"Saved {len(network_events)} events to {config.EVENTS_LOG}")
+
+        # AI Analysis of captured events (parallel for speed)
+        print("\n[AI Analysis] Analyzing captured network events in parallel...")
+
+        def analyze_with_index(args):
+            idx, event = args
+            return idx, analyze_network_event(event)
+
+        # Use ThreadPoolExecutor for parallel API calls (10 workers)
+        results = {}
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {executor.submit(analyze_with_index, (i, e)): i for i, e in enumerate(network_events)}
+            done_count = 0
+            for future in as_completed(futures):
+                done_count += 1
+                print(f"\r  Analyzed {done_count}/{len(network_events)} events...", end="", flush=True)
+                try:
+                    idx, analysis = future.result()
+                    results[idx] = analysis
+                except Exception:
+                    pass
+
+        print()  # newline after progress
+
+        # Apply results to events
+        enriched_events = []
+        for i, event in enumerate(network_events):
+            analysis = results.get(i)
+            if analysis:
+                event["ai_context"] = analysis
+                if analysis.get("useful_for_tool"):
+                    print(f"  - {analysis.get('purpose')} [{analysis.get('category')}]")
+            enriched_events.append(event)
+
+        # Save enriched events
+        enriched_path = config.EVENTS_LOG.replace(".json", "_enriched.json")
+        with open(enriched_path, "w") as f:
+            json.dump(enriched_events, f, indent=2)
+        print(f"Saved enriched events to {enriched_path}")
         
         time.sleep(2)
         browser.close()

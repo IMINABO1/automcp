@@ -26,7 +26,12 @@
       "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
     },
     "status": 200,
-    "post_data": "dsc=edb80898a2be1d3a25805ecc2d10cf5e0162e270faf448deb9d81351cd2b8647"
+    "post_data": "dsc=edb80898a2be1d3a25805ecc2d10cf5e0162e270faf448deb9d81351cd2b8647",
+    "ai_context": {
+      "purpose": "This request updates the server to record that the user has viewed a specific Trello board, likely for tracking recent activity or clearing notifications.",
+      "category": "write",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -48,7 +53,12 @@
       "content-type": "application/json; charset=utf-8"
     },
     "status": 200,
-    "post_data": "{\"query\":\"query TrelloMemberBoards{trello{__typename me@optIn(to:\\\"TrelloMe\\\"){id __typename boardStars{__typename edges{id __typename boardObjectId objectId position}}objectId username}}}\",\"variables\":{},\"operationName\":\"TrelloMemberBoards\"}"
+    "post_data": "{\"query\":\"query TrelloMemberBoards{trello{__typename me@optIn(to:\\\"TrelloMe\\\"){id __typename boardStars{__typename edges{id __typename boardObjectId objectId position}}objectId username}}}\",\"variables\":{},\"operationName\":\"TrelloMemberBoards\"}",
+    "ai_context": {
+      "purpose": "Retrieves the current user's starred boards and basic profile metadata.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -68,7 +78,12 @@
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
       "accept": "application/json,text/plain"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the comprehensive content of a Trello board, including its lists and detailed card data, to populate the user's current board view.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -90,7 +105,12 @@
       "content-type": "application/json; charset=utf-8"
     },
     "status": 200,
-    "post_data": "{\"query\":\"query TrelloCurrentBoardListsCards($id:TrelloShortLink!){trello{__typename boardByShortLink(shortLink:$id)@optIn(to:\\\"TrelloBoard\\\"){id __typename lists(first:-1){__typename edges{__typename node{id __typename cards(first:-1)@optIn(to:\\\"TrelloListCards\\\"){__typename edges{__typename node{id __typename closed labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}objectId...on TrelloCard{isTemplate}}}}}}}}}}\",\"variables\":{\"id\":\"a7UxwGZY\"},\"operationName\":\"TrelloCurrentBoardListsCards\"}"
+    "post_data": "{\"query\":\"query TrelloCurrentBoardListsCards($id:TrelloShortLink!){trello{__typename boardByShortLink(shortLink:$id)@optIn(to:\\\"TrelloBoard\\\"){id __typename lists(first:-1){__typename edges{__typename node{id __typename cards(first:-1)@optIn(to:\\\"TrelloListCards\\\"){__typename edges{__typename node{id __typename closed labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}objectId...on TrelloCard{isTemplate}}}}}}}}}}\",\"variables\":{\"id\":\"a7UxwGZY\"},\"operationName\":\"TrelloCurrentBoardListsCards\"}",
+    "ai_context": {
+      "purpose": "Retrieves the full list and card hierarchy for a specific Trello board, including card labels and metadata.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -112,7 +132,12 @@
       "content-type": "application/json; charset=utf-8"
     },
     "status": 200,
-    "post_data": "{\"query\":\"query TrelloCurrentBoardInfo($id:TrelloShortLink!){trello{__typename boardByShortLink(shortLink:$id)@optIn(to:\\\"TrelloBoard\\\"){id __typename closed creationMethod creator{id __typename objectId}customFields{__typename edges{__typename node{id __typename display{__typename cardFront}name objectId options{__typename color objectId position value{__typename text}}position type}}}description{__typename text}enterprise{id __typename displayName objectId}enterpriseOwned galleryInfo{id __typename avatarShape avatarUrl blurb byline category{__typename key}featured language{__typename description enabled language locale localizedDescription}precedence stats{__typename copyCount viewCount}}labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}lastActivityAt limits{__typename attachments{__typename perBoard{__typename disableAt status warnAt}perCard{__typename disableAt status warnAt}}boards{__typename totalMembersPerBoard{__typename disableAt status warnAt}}cards{__typename openPerBoard{__typename disableAt status warnAt}openPerList{__typename disableAt status warnAt}totalPerBoard{__typename disableAt status warnAt}totalPerList{__typename disableAt status warnAt}}checkItems{__typename perChecklist{__typename disableAt status warnAt}}checklists{__typename perBoard{__typename disableAt status warnAt}perCard{__typename disableAt status warnAt}}customFieldOptions{__typename perField{__typename disableAt status warnAt}}customFields{__typename perBoard{__typename disableAt status warnAt}}labels{__typename perBoard{__typename disableAt status warnAt}}lists{__typename openPerBoard{__typename disableAt status warnAt}totalPerBoard{__typename disableAt status warnAt}}reactions{__typename perAction{__typename disableAt status warnAt}uniquePerAction{__typename disableAt status warnAt}}stickers{__typename perCard{__typename disableAt status warnAt}}}members(first:-1){__typename edges{__typename membership{__typename deactivated objectId type unconfirmed workspaceMemberType}node{id __typename activityBlocked avatarUrl bio bioData confirmed enterprise{id __typename objectId}fullName initials nonPublicData{__typename avatarUrl fullName initials}objectId url username}}}name objectId powerUpData(first:-1){__typename edges{__typename node{id __typename access objectId powerUp{__typename objectId}scope value}}}powerUps(filter:{access:\\\"enabled\\\"},first:-1){__typename edges{__typename node{__typename objectId}objectId}}prefs{__typename background{__typename bottomColor brightness color image imageScaled{__typename height url width}tile topColor}calendarFeedEnabled canInvite cardAging cardCounts cardCovers comments hiddenPowerUpBoardButtons{__typename objectId}hideVotes invitations isTemplate permissionLevel selfJoin showCompleteStatus switcherViews{__typename enabled viewType}voting}premiumFeatures shortLink shortUrl tags(first:-1){__typename edges{__typename node{__typename objectId}}}url viewer{__typename calendarKey email{__typename key list{id __typename objectId}position}lastSeenAt sidebar{__typename show}subscribed}workspace{id __typename description displayName enterprise{id __typename admins(first:-1){__typename edges{__typename node{id __typename}}}displayName objectId}limits{__typename freeBoards{__typename disableAt status warnAt}freeCollaborators{__typename disableAt status warnAt}totalMembers{__typename disableAt status warnAt}}logoHash members(first:-1){__typename edges{__typename membership{__typename deactivated objectId type unconfirmed}node{id __typename objectId}}}name objectId offering prefs{__typename associatedDomain attachmentRestrictions boardDeleteRestrict{__typename enterprise org private public}boardInviteRestrict boardVisibilityRestrict{__typename enterprise org private public}externalMembersDisabled orgInviteRestrict permissionLevel}products tags(first:-1){__typename edges{__typename node{__typename name objectId}}}url website}}}}\",\"variables\":{\"id\":\"a7UxwGZY\"},\"operationName\":\"TrelloCurrentBoardInfo\"}"
+    "post_data": "{\"query\":\"query TrelloCurrentBoardInfo($id:TrelloShortLink!){trello{__typename boardByShortLink(shortLink:$id)@optIn(to:\\\"TrelloBoard\\\"){id __typename closed creationMethod creator{id __typename objectId}customFields{__typename edges{__typename node{id __typename display{__typename cardFront}name objectId options{__typename color objectId position value{__typename text}}position type}}}description{__typename text}enterprise{id __typename displayName objectId}enterpriseOwned galleryInfo{id __typename avatarShape avatarUrl blurb byline category{__typename key}featured language{__typename description enabled language locale localizedDescription}precedence stats{__typename copyCount viewCount}}labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}lastActivityAt limits{__typename attachments{__typename perBoard{__typename disableAt status warnAt}perCard{__typename disableAt status warnAt}}boards{__typename totalMembersPerBoard{__typename disableAt status warnAt}}cards{__typename openPerBoard{__typename disableAt status warnAt}openPerList{__typename disableAt status warnAt}totalPerBoard{__typename disableAt status warnAt}totalPerList{__typename disableAt status warnAt}}checkItems{__typename perChecklist{__typename disableAt status warnAt}}checklists{__typename perBoard{__typename disableAt status warnAt}perCard{__typename disableAt status warnAt}}customFieldOptions{__typename perField{__typename disableAt status warnAt}}customFields{__typename perBoard{__typename disableAt status warnAt}}labels{__typename perBoard{__typename disableAt status warnAt}}lists{__typename openPerBoard{__typename disableAt status warnAt}totalPerBoard{__typename disableAt status warnAt}}reactions{__typename perAction{__typename disableAt status warnAt}uniquePerAction{__typename disableAt status warnAt}}stickers{__typename perCard{__typename disableAt status warnAt}}}members(first:-1){__typename edges{__typename membership{__typename deactivated objectId type unconfirmed workspaceMemberType}node{id __typename activityBlocked avatarUrl bio bioData confirmed enterprise{id __typename objectId}fullName initials nonPublicData{__typename avatarUrl fullName initials}objectId url username}}}name objectId powerUpData(first:-1){__typename edges{__typename node{id __typename access objectId powerUp{__typename objectId}scope value}}}powerUps(filter:{access:\\\"enabled\\\"},first:-1){__typename edges{__typename node{__typename objectId}objectId}}prefs{__typename background{__typename bottomColor brightness color image imageScaled{__typename height url width}tile topColor}calendarFeedEnabled canInvite cardAging cardCounts cardCovers comments hiddenPowerUpBoardButtons{__typename objectId}hideVotes invitations isTemplate permissionLevel selfJoin showCompleteStatus switcherViews{__typename enabled viewType}voting}premiumFeatures shortLink shortUrl tags(first:-1){__typename edges{__typename node{__typename objectId}}}url viewer{__typename calendarKey email{__typename key list{id __typename objectId}position}lastSeenAt sidebar{__typename show}subscribed}workspace{id __typename description displayName enterprise{id __typename admins(first:-1){__typename edges{__typename node{id __typename}}}displayName objectId}limits{__typename freeBoards{__typename disableAt status warnAt}freeCollaborators{__typename disableAt status warnAt}totalMembers{__typename disableAt status warnAt}}logoHash members(first:-1){__typename edges{__typename membership{__typename deactivated objectId type unconfirmed}node{id __typename objectId}}}name objectId offering prefs{__typename associatedDomain attachmentRestrictions boardDeleteRestrict{__typename enterprise org private public}boardInviteRestrict boardVisibilityRestrict{__typename enterprise org private public}externalMembersDisabled orgInviteRestrict permissionLevel}products tags(first:-1){__typename edges{__typename node{__typename name objectId}}}url website}}}}\",\"variables\":{\"id\":\"a7UxwGZY\"},\"operationName\":\"TrelloCurrentBoardInfo\"}",
+    "ai_context": {
+      "purpose": "Retrieves comprehensive metadata and configuration details for a specific Trello board using its short link.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -134,7 +159,12 @@
       "content-type": "application/json; charset=utf-8"
     },
     "status": 200,
-    "post_data": "{\"query\":\"query TrelloBoardMirrorCards($id:TrelloShortLink!,$after:String,$first:Int=50){trello{__typename boardMirrorCardInfo(shortLink:$id)@optIn(to:\\\"TrelloBoardMirrorCardInfo\\\"){id __typename mirrorCards(after:$after,first:$first){__typename edges{__typename node{id __typename mirrorCard{id __typename}sourceBoard{id __typename closed customFields{__typename edges{__typename node{id __typename display{__typename cardFront}name objectId options{__typename color objectId position value{__typename text}}position type}}}enterprise{id __typename objectId}labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}name objectId powerUps{__typename edges{__typename node{__typename objectId}objectId}}prefs{__typename background{__typename brightness color image imageScaled{__typename height url width}tile topColor}cardAging cardCovers showCompleteStatus}shortLink url workspace{id __typename objectId}}sourceCard{id __typename attachments(first:-1){__typename edges{__typename node{id __typename isMalicious objectId}}}badges{__typename attachments attachmentsByType{__typename trello{__typename board card}}checkItems checkItemsChecked checkItemsEarliestDue comments description due{__typename at complete}externalSource lastUpdatedByAi location maliciousAttachments startedAt viewer{__typename subscribed voted}votes}checklists(first:-1){__typename edges{__typename node{id __typename objectId}}}closed complete cover{__typename attachment{id __typename objectId}brightness color edgeColor powerUp{__typename objectId}previews{__typename edges{__typename node{__typename bytes height objectId scaled url width}}}sharedSourceUrl size uploadedBackground{__typename objectId}yPosition}creation{__typename loadingStartedAt method}customFieldItems(first:-1){__typename edges{__typename node{__typename customField{id __typename objectId}objectId value{__typename checked date number objectId text}}}}description{__typename text}due{__typename at reminder}isTemplate labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}lastActivityAt limits{__typename stickers{__typename perCard{__typename disableAt}}}list@optIn(to:\\\"TrelloListBoard\\\"){id __typename board{id __typename objectId}closed name objectId position softLimit}location{__typename address coordinates{__typename latitude longitude}name staticMapUrl}members(first:-1){__typename edges{__typename node{id __typename avatarUrl fullName initials nonPublicData{__typename avatarUrl fullName initials}objectId username}}}mirrorSourceId mirrorSourceNodeId name objectId pinned powerUpData{__typename edges{__typename node{id __typename objectId powerUp{__typename objectId}value}}}role shortId shortLink singleInstrumentationId stickers(first:-1){__typename edges{__typename node{__typename image imageScaled{__typename height objectId scaled url width}left objectId rotate top url zIndex}}}url}}}pageInfo{__typename endCursor hasNextPage}}}}}\",\"variables\":{\"id\":\"a7UxwGZY\"},\"operationName\":\"TrelloBoardMirrorCards\"}"
+    "post_data": "{\"query\":\"query TrelloBoardMirrorCards($id:TrelloShortLink!,$after:String,$first:Int=50){trello{__typename boardMirrorCardInfo(shortLink:$id)@optIn(to:\\\"TrelloBoardMirrorCardInfo\\\"){id __typename mirrorCards(after:$after,first:$first){__typename edges{__typename node{id __typename mirrorCard{id __typename}sourceBoard{id __typename closed customFields{__typename edges{__typename node{id __typename display{__typename cardFront}name objectId options{__typename color objectId position value{__typename text}}position type}}}enterprise{id __typename objectId}labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}name objectId powerUps{__typename edges{__typename node{__typename objectId}objectId}}prefs{__typename background{__typename brightness color image imageScaled{__typename height url width}tile topColor}cardAging cardCovers showCompleteStatus}shortLink url workspace{id __typename objectId}}sourceCard{id __typename attachments(first:-1){__typename edges{__typename node{id __typename isMalicious objectId}}}badges{__typename attachments attachmentsByType{__typename trello{__typename board card}}checkItems checkItemsChecked checkItemsEarliestDue comments description due{__typename at complete}externalSource lastUpdatedByAi location maliciousAttachments startedAt viewer{__typename subscribed voted}votes}checklists(first:-1){__typename edges{__typename node{id __typename objectId}}}closed complete cover{__typename attachment{id __typename objectId}brightness color edgeColor powerUp{__typename objectId}previews{__typename edges{__typename node{__typename bytes height objectId scaled url width}}}sharedSourceUrl size uploadedBackground{__typename objectId}yPosition}creation{__typename loadingStartedAt method}customFieldItems(first:-1){__typename edges{__typename node{__typename customField{id __typename objectId}objectId value{__typename checked date number objectId text}}}}description{__typename text}due{__typename at reminder}isTemplate labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}lastActivityAt limits{__typename stickers{__typename perCard{__typename disableAt}}}list@optIn(to:\\\"TrelloListBoard\\\"){id __typename board{id __typename objectId}closed name objectId position softLimit}location{__typename address coordinates{__typename latitude longitude}name staticMapUrl}members(first:-1){__typename edges{__typename node{id __typename avatarUrl fullName initials nonPublicData{__typename avatarUrl fullName initials}objectId username}}}mirrorSourceId mirrorSourceNodeId name objectId pinned powerUpData{__typename edges{__typename node{id __typename objectId powerUp{__typename objectId}value}}}role shortId shortLink singleInstrumentationId stickers(first:-1){__typename edges{__typename node{__typename image imageScaled{__typename height objectId scaled url width}left objectId rotate top url zIndex}}}url}}}pageInfo{__typename endCursor hasNextPage}}}}}\",\"variables\":{\"id\":\"a7UxwGZY\"},\"operationName\":\"TrelloBoardMirrorCards\"}",
+    "ai_context": {
+      "purpose": "Retrieves data about mirrored cards on a specific Trello board, including their source board information and custom field settings.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -146,7 +176,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the classification data used to map browser cookies to privacy categories like essential or analytics for Atlassian services.",
+      "category": "analytics",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -172,7 +207,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Fetches hardware identification data for Intel graphics cards to optimize browser rendering and performance.",
+      "category": "other",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -188,7 +228,12 @@
       "x-client-name": "feature-gate-js-client",
       "content-type": "application/json"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves feature flag configurations and experimental toggle states to determine available interface features for the Trello web application.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -205,7 +250,12 @@
       "content-type": "application/json"
     },
     "status": 200,
-    "post_data": "{\"identifiers\":{\"atlassianAccountId\":\"712020:8d77ca7f-09f0-4b38-92cf-94b7270b5a34\",\"analyticsAnonymousId\":\"e6e6a109-d7ef-4ad5-8f64-b4a7f1e93aa5\"},\"customAttributes\":{\"inEnterprise\":false,\"version\":231871,\"locale\":\"en-US\",\"isDesktop\":false,\"isTouch\":false,\"idEnterprises\":[],\"signupDate\":1769875257000,\"channel\":\"main\",\"isPremium\":false,\"isStandard\":false,\"hasMultipleEmails\":false,\"userCohortPersonalProductivity\":\"ga\",\"userCohortReferralPilot\":\"not_set\",\"inRealEnterprise\":false,\"hasEnterpriseDomain\":false},\"targetApp\":\"trello_web\"}"
+    "post_data": "{\"identifiers\":{\"atlassianAccountId\":\"712020:8d77ca7f-09f0-4b38-92cf-94b7270b5a34\",\"analyticsAnonymousId\":\"e6e6a109-d7ef-4ad5-8f64-b4a7f1e93aa5\"},\"customAttributes\":{\"inEnterprise\":false,\"version\":231871,\"locale\":\"en-US\",\"isDesktop\":false,\"isTouch\":false,\"idEnterprises\":[],\"signupDate\":1769875257000,\"channel\":\"main\",\"isPremium\":false,\"isStandard\":false,\"hasMultipleEmails\":false,\"userCohortPersonalProductivity\":\"ga\",\"userCohortReferralPilot\":\"not_set\",\"inRealEnterprise\":false,\"hasEnterpriseDomain\":false},\"targetApp\":\"trello_web\"}",
+    "ai_context": {
+      "purpose": "Retrieves feature flag and A/B experiment configurations tailored to the user's account attributes and device context.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -232,7 +282,12 @@
       "sec-ch-ua-mobile": "?0"
     },
     "status": 200,
-    "post_data": "{\"namespace\":\"trello_web\",\"identifiers\":{\"atlassianAccountId\":\"712020:8d77ca7f-09f0-4b38-92cf-94b7270b5a34\"},\"metadata\":{\"isDesktop\":false,\"isTouch\":false,\"locale\":\"en-US\",\"clientVersion\":\"build-231871\",\"emailDomain\":\"gmail.com\",\"hasBC\":true,\"hasMultipleEmails\":false,\"head\":\"build\",\"idEnterprises\":[],\"idOrgs\":[\"697e27754fb70f3abb91d906\",\"697e2779db465a44167ec693\"],\"isClaimable\":false,\"inEnterprise\":false,\"orgs\":[\"[Redacted]\"],\"signupDate\":1769875257000,\"premiumFeatures\":[\"activity\",\"additionalBoardBackgrounds\",\"additionalStickers\",\"advancedChecklists\",\"aiQuickCapture\",\"atlassianIntelligence\",\"boardExport\",\"butlerBC\",\"butlerPremium\",\"collapsibleLists\",\"csvExport\",\"customBoardBackgrounds\",\"customEmoji\",\"customStickers\",\"deactivated\",\"export\",\"goldMembers\",\"inviteBoard\",\"inviteOrg\",\"isBc\",\"isPremium\",\"largeAttachments\",\"listColors\",\"multiBoardGuests\",\"observers\",\"paidCorePlugins\",\"plugins\",\"premiumMirrorCards\",\"privateTemplates\",\"readSecrets\",\"removal\",\"restrictVis\",\"savedSearches\",\"shortExportHistory\",\"starCounts\",\"superAdmins\",\"tags\",\"views\",\"workspaceViews\"],\"products\":[110],\"version\":231871}}"
+    "post_data": "{\"namespace\":\"trello_web\",\"identifiers\":{\"atlassianAccountId\":\"712020:8d77ca7f-09f0-4b38-92cf-94b7270b5a34\"},\"metadata\":{\"isDesktop\":false,\"isTouch\":false,\"locale\":\"en-US\",\"clientVersion\":\"build-231871\",\"emailDomain\":\"gmail.com\",\"hasBC\":true,\"hasMultipleEmails\":false,\"head\":\"build\",\"idEnterprises\":[],\"idOrgs\":[\"697e27754fb70f3abb91d906\",\"697e2779db465a44167ec693\"],\"isClaimable\":false,\"inEnterprise\":false,\"orgs\":[\"[Redacted]\"],\"signupDate\":1769875257000,\"premiumFeatures\":[\"activity\",\"additionalBoardBackgrounds\",\"additionalStickers\",\"advancedChecklists\",\"aiQuickCapture\",\"atlassianIntelligence\",\"boardExport\",\"butlerBC\",\"butlerPremium\",\"collapsibleLists\",\"csvExport\",\"customBoardBackgrounds\",\"customEmoji\",\"customStickers\",\"deactivated\",\"export\",\"goldMembers\",\"inviteBoard\",\"inviteOrg\",\"isBc\",\"isPremium\",\"largeAttachments\",\"listColors\",\"multiBoardGuests\",\"observers\",\"paidCorePlugins\",\"plugins\",\"premiumMirrorCards\",\"privateTemplates\",\"readSecrets\",\"removal\",\"restrictVis\",\"savedSearches\",\"shortExportHistory\",\"starCounts\",\"superAdmins\",\"tags\",\"views\",\"workspaceViews\"],\"products\":[110],\"version\":231871}}",
+    "ai_context": {
+      "purpose": "Retrieves feature flag configurations and UI toggles for a Trello user based on their account metadata and subscription status.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -246,7 +301,12 @@
       "content-type": "application/json",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves personalized content, UI settings, or feature recommendations tailored to a specific Trello user profile.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -260,7 +320,12 @@
     },
     "status": 202,
     "post_data_base64": "H4sIAAAAAAAACu3dW1PbutrA8e+Sa7Im5wN3FGihLYXSA6Xv7NEotpyokSVXkgNhT7/7HjtAu+nqym5LeGfK/44kxrFkSfnNI/nRvxtqoWwMje3/+/fqz1cyV43tRogyBj3d3p7KqIS6LFwovWpsNcqgfGP7342kDNHlh3uhehG9MsadOT8PhUzUYdrYbgzGQ9UZDvu9bDJsZV05mYzb6bg1aGw1ZDQyBC3tTpK40sb6+GG70+q0tkfpcJjIYdZsjbNWszfpjprjTpI1x73JsDNsTfqy26tOYaVZRp2EHevsMndlqE+iBmog261xMx2qrNmTab85yga95qQnh1lbjbtS9htftq6vvrp0HXaN1LmcGNXYzqQJaqsxk2HfRuULr4Pac7nU9vazqvz7udTm5v3GtHr1V+LyxlYjqGmubBQ6VTbquBRyVUKReCWjSoVRIYg4k1a0eyKVyyCk1GljO/pSbTUWygftbGO7022Phu2thg57KsyjK26/P5lJa5VpbDfqr19d0K6bOR9PVaa8l+ZEGxcb2w3roggqNqrTvHVlMrs9ifphAS6+3sOqUfz4Lv6rrqaj0kRdGFXXSLg9vw5vorSp9OnXt+zXKv3muBOvcl3mNxWg7amS5m+O/FrKE+WDs9KceJeWSdQLHZdVIWRjq2FcIqv72FC2+e7Nfxfnn5vkD29Ypn2IIuq6V3RanUGz1W5222/bg+1WZ7s9+GvY7/WHo9ao/7G6/3pqy2JPRtXYbg8H49Gw3+kPW61W9Q1fi1VV7b++rEp1uPfTjf+6c+7bhfbOVg2u7oS66pmN4rpenG18+bLVWEhTqsa2LY3ZauQqylRGWR0+rS+yUcwuhbYTdymMnCgTGlv1J+9X/9aoq7+x1fClUfWVpiqTpaka1cS5GKKXxdE3Z70ZHn6xZNW/7UzrAq2uWBbF+5tOsXqnvj1+efvytid/d/P/phX+c+/NdeJd2LkIOwupjZxoo+Pyo7PVScvQVDLEZjv9yV7yv7Xc7zv6j3vXj3vv3w1m/8v48P24c7ex/rAD//fA8t3o9D93wFXd79vFdROua/v3R9R/7JD30uV/OGT906/InYHv9hfp+vf0//kHcuvnftC/XDfJmy6pi5u/brrk6tXPDFtTZZWX0fk3ey8ObeaqI0M6f7ssqpvySS5kMyi/UL5qIun8doxodP9q/9WtLskkZVzd83F3PBr2Rq3Bl62GVzLUxz25Gb1OpI9amndB+SMZk9n2qUrc1OorVfX01Vka/3WaajhUidILle588+G43x53htVXB5W4atxZ7l+76boLrZrUN4d3u1+2cBfuwl2P0l1GhygS6VNRlx16QS/oBb2gF/SCXtALem2QXlW16Su1kpfwKpNJdB6CQTAIBsEgGASDYBAMgm2OYLnyU1WHv5h0hF2wC3bBLtgFu2AX7Noku1yqfDXSiIlbTT0ao+pTBFFeIjEkhsSQGBJDYkgMiSGxh5NYuNAxmSkPySAZJINkkAySQTJIBskekGSLb+NicuLqIU8YnWvW5wMxIAbEgBgQA2JADIhtEmLVXVw9G5l6ORXSVn+4AoNhMAyGwTAYBsNgGAyDbc5g3i3cimATmcyRF/JCXsgLeSEv5IW8kNeG5aWDkTaFXbALdsEu2AW7YBfsgl2bY1fIpY8iJDOVlkaJvAO+wBf4Al/gC3yBL/AFvjaHr1X3rXYhIh0Y7IJdsAt2wS7YBbtg16bYZWTMnM+bicsLZ5WNzYUOpTRNrzKvwuwOxKr79K3DOvnbZ53xx9PsYHzudvbLo6nLLs+2263WX63Wdg+f4TN8hs/wGT7DZ/gMn/2kz2IFNKFs1QFELq2cVoX2sm7HRMlQGApDYSgMhaEwFIbCNqqwXE991dG9K6vufnuhIpVhtsoYZpxMFVtIwjJYBstgGSyDZbAMlj0gy5yf3tZDIadqncX6O1fHnbMnJy+WXfXMnvV6B0eDpA/NoBk0g2bQDJpBM2gGze6JZrnKJ8rfnbj8blVZ2t993vm0ezRrnRw9eTHdm+69GI5vVpV10Rk6Q2foDJ2hM3SGztDZL+ksBC+U986LC+mttlMxqZoZ05coDIWhMBSGwlAYCkNhG1VYmTmhbVRVpEw7K+RcqFRHd5dhd2Nk7c+vDqflq6s3Z912dnFWfHz34WDvnBgZOkNn6AydoTN0hs7Q2S/rrO6614NYU3UmTanXkezlfjp+9eLsqTJvXqud00JmcahvSDaAZJAMkkEySAbJIBkkg2S/RrILNWkGJWNTltHlddSsuVpX1pwYl8yNrn8FmcOEZJAMkkEySAbJIBkk2xjJhEyD0ImzZCTDXbgLd+Eu3IW7cBfu2qy7JipKUdfhP81LdvWz5Lw89bO9d+/7au/tk7ODUbEgST8YA2NgDIyBMTAGxsDYb2IskTZRRkSvpRH1R2uCYcALeAEv4PUHwuud9dALekEv6PUQ9FJGJdHrRJRBCeOm2oqZtndXgd2Niw3HveLNmQlHw+dvP+2/KV+fzPf2j1EZKkNlqOwPVBnhMEyGyTDZw5js6wZJ0pgq+6u0+mqV5CIxLqhU1JsmrUsGO8h2Xhxm8/hskZ60wnzwedQ5OPxwM3vZgWtwDa7BNbgG1+AaXINrv821iYpReZHKqFjQj8JQGApDYQ+isB4KQ2EoDIUFJWY6VcKr3C2UyLzLxW0liiTeXfL/ncsGw9N3r4r5xXl/od7vJ59ng8w/vdpu10GzNlyDa3ANrsE1uAbX4Bpc+22ueZWpmMyEthN3SdQMhsEwGAbDYBgMg2Ew7OEYFvRV1R9EqhbKuEJ5USUmc+bu45h315n1FoeD9qkd7h/vRbtzOkxfXyYfbjcdJ2SG1bAaVsNqWA2rYTWs9vtWqy5KhLkuRJWyXxh3pex0bdYMYmd4DI/hMTyGx/AYHsNj9+WxCzURUovrkU+JiUzmU+9Km2IyTIbJMBkmw2SYDJNhsgcz2e2i/9UWl0LbTFsdlWCbS1yGy3AZLsNluAyX4bKNuyxTMpZe1cn9RWJ03YitjuJCx5kovFvotB7kSPuPxtAYGntsGnvYtP94DI/hsUfssalzYtUpqnnLwru8iGszlsEv+AW/4Bf8gl/wC37Br1/ml5fF7LMRXkW/FEbb+Tp7dS+Pvf/8Oe6M5qPjcvdi/nQQPx4gMkSGyBDZHygypifxGB7DYw/iMetssyhyEbSdGiUKI5frZyNZIobBMBgGw2AYDINhMAz2ewZb+moust7ZUkxKbVLlhUxTHfVitXBs3XaXz88+hNTOBvHkbCHTYTs7Wey/hWfwDJ7BM3gGz+AZPINn98izUNqgfpR/7K7POt3BVXr4fPz5Ym/Wf/1+ePji0u0N2Y4cqAE1oAbUgBpQA2pA7T6hZpxMtZ2KUq/BWXfvQ2uw/2p+Embvi8nUO7W/Nx9iMkyGyTAZJsNkmAyTYbJfN1mmVFrlhRWJM0Yl0d1dYHaXZO3949lpnpwkrdAv/LNPT+TMzi7ZVgmbYTNshs2wGTbDZtjsHmxm1YVYFaDq8MprZZN105ndvf33g9EktMc7u7rXerUbZk8+LlAZKkNlqAyVoTJUhspQ2a+pzFlVlTFXIcipCsKqWNWd+FwqvxTO1tOb2k7XbU3+YS4P9GA2nwyOfedkcDl9s3OU38TQumgNraE1tIbW0BpaQ2to7de0Vkidft1wiUSysAt2wa7HyC4SyQIv4AW8Hghe/rrtiMIVZSFSHXIdgpiUMTq7JjY2dkft88+73eP8fb7nJ/vFYnm2JDSG0TAaRvuTjUZoDKEhNIT2IEIri7Tq6Nd7kDv7lWyrT9Yg7TiOT1TWGZ18Pjkd702n48nHoQdpIA2kgTSQBtJAGkgDab+JtAs1qXJmJFXKjG+e07RRXcY1QBte2MNFv3WQn38od4fHrVcHb8evjxAaQkNoCA2hITSEhtAQ2j0ITeeFdwuVCm0n7lKEuTJq/TTnp+D3Rk9be1k4z4rsydOTlx8Gkqyz+Ayf4TN8hs/wGT7DZ/fgMytXWzV9NsLIiTJrnwPoj+fHO8vxm7A4yJ5MZm/Ofedq9902+c2QGTJDZsgMmSEzZIbM7klmq7jZ39rsu800hwcfL/tXR+dJ1rZnY9OzR+XTGdOa4AycgTNwBs7AGTgDZ/eHM6NDDPUStCC8M8aV65aeDZ4fPnGnp1odLN/O/PhlfHtpDm43COj0QBpIA2kgDaSBNJAG0kDaryOt0NaqdMWzddOaqcpkaSL8gl/wC37BL/gFv+AX/Pp1fpWZu97RPFzomMzUus0z82cXvdb5ydHLN2cuab/d73ZaU/JmQDNoBs2gGTSDZtAMmt0XzVbFvhZarmy5bmvzo48d2bs8e371MiZnobc/Pbo6iPAMnsEzeAbP4Bk8g2fw7Dd5dplVOwIkblHtmSnTUKc0886s01krvP+QLJ5dpL2nZ4t3tpc9f/GR5zFBGSgDZaAMlIEyUAbKfh1l6rJQXtfN97Z3ieimU3N3O4Dv1pYNh+enzz768Kwwu4OXr+Ozy/ZRenWdMoNsZhgNo2E0jIbRMBpGw2i/ZbS6k4t6HBC+6vhG5zpqO133XGZhL+PxcHaonh6Mhnb//KrdPbI3s5s8lgnSQBpIA2kgDaSBNJD260jTdqFXfV15rWyiRGeNzTpxd9e8nO6bF8f5i2dP5nL52ZUdVp5hM2yGzbAZNsNm2Ayb3ZvNwlwXN88HJM5m2ueyPtuaiU4khsSQGBL7AyX2znoshsWwGBZ7IIs5W01eWuXFTMlU+W8iZuueBbDHn5LOq97rDyfnL6btaavfcqF7Ey8bozSUhtJQ2h+oNOJlGA2jYbSHMlrhQhQuy3Ryk0gjJF4pKwojE1V/CyEzMAbGwNjjwxghMzgGx+DYw3GsDKrO9i9SL6dCXUblrbybOeM7gpH6H4khMST250qMsBgOw2E47CEdttDqQmTOi6oeqxsoCnehfFmsmbzsvt9/+fJpuzPWk6e5/7BTyvT8/PXN5OUQpaE0lIbSUBpKQ2koDaX9pNKqWUtTNSkvZBmdKItUVvkxRFp9TqgMhIEwEAbCQBgIA2EgbNMIW6UqK7yqA2ZR5YXz0i+RGBJDYkgMiSExJIbEkNgGJVZOtRW5S5W3+qrOdHG9mn8i1+1Z3nlm2q/ePz3qvHz/5DQ/Pe0M3+x0b6cr2yQnA2gADaABNIAG0AAaQPtZoBVGxsz5XOTO2U/KmKWYhETkMkTlxVwbEy50TGY8aAnEgBgQe4QQe9gHLcdQDIpBscdMsVRVFy/CMkSVi6hkLpytI2bVQjJbBdJUcGaxdj0ZKANloAyUgbLfQ1mf+BgoA2WPGmVl5kQIXnhlq2yxhXeZNuru/CUEg2AQDIJBMAgGwSAYBLs/gjXTEJteySQ226NmGVRTp/ALfsEv+AW/NsyvAfyCX/DrEfNLZPpSJC4vnK0acPUVapXeQtWJyEIZCmUDk5KQDJJBMki2YZKN+pAMkkGyx0yyalIy8TrqRBqRq+h1EkQhl8ZJQmM4DIfhMBy2UYd1WsxM4jAchsMWiVWXUUQnsmVnIFo9USUdq5rkdZQMkAEyQAbIANmGQUZgDJABskcPMnWZmDJVolsIZerdwoPIvMtFjIsEjIExMAbGwBgYA2NgDIxtGGO26gciV6mW9XKxCmFi0cVhOAyH4TAchsNwGA7DYRteLSbtQgYxUzLmshBZaUy1O1JST1SCMTAGxsAYGNswxniaEoyBsUePseqJysKFKHR1qbI+i0hmKpmLRSJSNSmnkAySQTJIBsk2S7IBq/ghGSR79CSTaSpumrCVuQrVgv7U5cJlWZ35NSAyRIbIEBkiQ2SIDJEhss2KzKvcLVSde78wMlEzZ6oE/NpeLyHrATJABsgAGSADZIAMkAGyBwFZqqp1Y3XxE2czPRWZViYlPgbH4Bgcg2Ob5tgIjsExOPbYOfbNjGUQq3qIM69CFSfDYlgMi2ExLIbFsBgWw2Kbs9h1houJirHaH1xOlajSv674AcSAGBADYkAMiAExIAbE7h1i9c7gdURsIiuCLYWuBjrgBbyAF/ACXhuF17ANvIAX8HqE8LqNgOXO2U/KmKWYhESUWsy1MeFCx2QGw2AYDINhMGzDDBvDMBgGwx4xw5ppiM0wk4VqxpnKVTNVmSxNXEewr4chMSSGxJDYnyax04dz2IhwGA7DYY/aYQsdSmmaXmXVavymTpzl4Uj0hb7Q12PU14PGwUZd/IW/8Ncj9pdIVXXxIixDVLmISuaicD5KI4yb6kT49qjKwA/JIBkkg2SQbMMkI30YJINkj5FkX5fmV8kqLtQk9XpR53BlgT78gl/wC35tml9jZiThF/x6jPy6s+ekqfJTJCZUYbAggsyV8CqJodqKUlcnZZYSk2EyTIbJMBkmw2SYbNMZ9eWFqD4XcaZ9WkhPwjAIBsEgGATbOMGYlYRgEOzRE+w6e+siucUYAkNgCAyBIbANC6yPwBAYAkNgtcCi13muUlHIpXGSHYxQGApDYSgMhaEwFIbC7l9hmUq9zItm4txcq9BMnI3eGVaBQS/oBb2g12bp1a4uCnpBL+j16Oj1g9T5qZqUU5G7VGEwDIbBMBgG27jB/nVbM98OpHcK1Rn81VoV9ZsqCInXRWwmRld1WZ9mshqfrytcheoE9Tg8kqPBZJR1mmlr0m32smHSHGX9tKnGk/Gg3+9P2km7sVUN9GYik/k7f307v3z5Dz/6j75cgwMA",
-    "post_data_is_binary": true
+    "post_data_is_binary": true,
+    "ai_context": {
+      "purpose": "Registers a client session or telemetry event to track user behavior and application performance within Atlassian products.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -286,7 +351,12 @@
     },
     "status": 202,
     "post_data_base64": "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",
-    "post_data_is_binary": true
+    "post_data_is_binary": true,
+    "ai_context": {
+      "purpose": "Registers a user session or event for Atlassian's experimentation and analytics platform.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -303,7 +373,12 @@
       "content-type": "application/json"
     },
     "status": 200,
-    "post_data": "{\"identifiers\":{\"trelloWorkspaceId\":\"697e27754fb70f3abb91d906\",\"atlassianAccountId\":\"712020:8d77ca7f-09f0-4b38-92cf-94b7270b5a34\",\"analyticsAnonymousId\":\"e6e6a109-d7ef-4ad5-8f64-b4a7f1e93aa5\"},\"customAttributes\":{\"inEnterprise\":false,\"version\":231871,\"locale\":\"en-US\",\"isDesktop\":false,\"isTouch\":false,\"workspaceId\":\"697e27754fb70f3abb91d906\",\"idEnterprises\":[],\"workspaceIds\":[\"697e27754fb70f3abb91d906\"],\"signupDate\":1769875257000,\"channel\":\"main\",\"isPremium\":true,\"isStandard\":false,\"emailDomain\":\"gmail.com\",\"userEmailDomain\":\"gmail.com\",\"isClaimable\":false,\"hasMultipleEmails\":false,\"userCohortPersonalProductivity\":\"ga\",\"userCohortReferralPilot\":\"not_set\",\"inRealEnterprise\":false,\"hasEnterpriseDomain\":false},\"targetApp\":\"trello_web\"}"
+    "post_data": "{\"identifiers\":{\"trelloWorkspaceId\":\"697e27754fb70f3abb91d906\",\"atlassianAccountId\":\"712020:8d77ca7f-09f0-4b38-92cf-94b7270b5a34\",\"analyticsAnonymousId\":\"e6e6a109-d7ef-4ad5-8f64-b4a7f1e93aa5\"},\"customAttributes\":{\"inEnterprise\":false,\"version\":231871,\"locale\":\"en-US\",\"isDesktop\":false,\"isTouch\":false,\"workspaceId\":\"697e27754fb70f3abb91d906\",\"idEnterprises\":[],\"workspaceIds\":[\"697e27754fb70f3abb91d906\"],\"signupDate\":1769875257000,\"channel\":\"main\",\"isPremium\":true,\"isStandard\":false,\"emailDomain\":\"gmail.com\",\"userEmailDomain\":\"gmail.com\",\"isClaimable\":false,\"hasMultipleEmails\":false,\"userCohortPersonalProductivity\":\"ga\",\"userCohortReferralPilot\":\"not_set\",\"inRealEnterprise\":false,\"hasEnterpriseDomain\":false},\"targetApp\":\"trello_web\"}",
+    "ai_context": {
+      "purpose": "Retrieves feature flag and A/B experiment configurations for a Trello user and workspace based on their account attributes.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -318,7 +393,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the ID and enabled plugin configuration for a specific Trello board.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -346,7 +426,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves billing details, member counts, and subscription type for a specific Trello organization workspace.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -358,7 +443,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves a specific background image asset for display in the Trello user interface.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -378,7 +468,12 @@
       "apollographql-client-name": "trello-web"
     },
     "status": 200,
-    "post_data": "{\"operationName\":\"TrelloNotificationsGetUnreadQuickCapture\",\"variables\":{\"offset\":11},\"query\":\"query TrelloNotificationsGetUnreadQuickCapture($offset: Int = 10) {\\n  trello {\\n    me @optIn(to: \\\"TrelloMe\\\") {\\n      id\\n      notifications(\\n        filter: {status: \\\"UNREAD\\\", types: [\\\"QUICK_CAPTURE\\\"]}\\n        first: $offset\\n      ) @optIn(to: \\\"TrelloMemberNotifications\\\") {\\n        edges {\\n          node {\\n            ... on TrelloQuickCaptureNotification {\\n              ...TrelloQuickCaptureNotificationFields\\n              __typename\\n            }\\n            __typename\\n          }\\n          __typename\\n        }\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\\nfragment TrelloQuickCaptureNotificationFields on TrelloQuickCaptureNotification {\\n  id\\n  card {\\n    id\\n    __typename\\n  }\\n  __typename\\n}\"}"
+    "post_data": "{\"operationName\":\"TrelloNotificationsGetUnreadQuickCapture\",\"variables\":{\"offset\":11},\"query\":\"query TrelloNotificationsGetUnreadQuickCapture($offset: Int = 10) {\\n  trello {\\n    me @optIn(to: \\\"TrelloMe\\\") {\\n      id\\n      notifications(\\n        filter: {status: \\\"UNREAD\\\", types: [\\\"QUICK_CAPTURE\\\"]}\\n        first: $offset\\n      ) @optIn(to: \\\"TrelloMemberNotifications\\\") {\\n        edges {\\n          node {\\n            ... on TrelloQuickCaptureNotification {\\n              ...TrelloQuickCaptureNotificationFields\\n              __typename\\n            }\\n            __typename\\n          }\\n          __typename\\n        }\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\\nfragment TrelloQuickCaptureNotificationFields on TrelloQuickCaptureNotification {\\n  id\\n  card {\\n    id\\n    __typename\\n  }\\n  __typename\\n}\"}",
+    "ai_context": {
+      "purpose": "This request retrieves a list of unread 'Quick Capture' notifications for the authenticated Trello user.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -395,7 +490,12 @@
       "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
     },
     "status": 200,
-    "post_data": "dsc=edb80898a2be1d3a25805ecc2d10cf5e0162e270faf448deb9d81351cd2b8647"
+    "post_data": "dsc=edb80898a2be1d3a25805ecc2d10cf5e0162e270faf448deb9d81351cd2b8647",
+    "ai_context": {
+      "purpose": "This request updates the user's activity history by marking a specific Trello board as recently viewed.",
+      "category": "write",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -421,7 +521,12 @@
     },
     "status": 202,
     "post_data_base64": "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",
-    "post_data_is_binary": true
+    "post_data_is_binary": true,
+    "ai_context": {
+      "purpose": "Registers a client session or page load event with Atlassian's analytics platform to track user activity and product telemetry.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -437,7 +542,12 @@
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
       "content-type": "application/json"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the count of unread notifications for the currently logged-in user.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -453,7 +563,12 @@
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
       "content-type": "application/json"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "This request retrieves the current user's unread notifications grouped by context, including detailed metadata for the associated Trello cards and boards.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -468,7 +583,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves a Trello member's profile details and licensing/subscription status for all organizations they belong to.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -483,7 +603,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves detailed information about a specific Trello workspace, including its members, enterprise status, and subscription details.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -498,7 +623,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Fetches profile information and enterprise-level administrative status for a specific Trello user.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -512,7 +642,12 @@
     },
     "status": 202,
     "post_data_base64": "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",
-    "post_data_is_binary": true
+    "post_data_is_binary": true,
+    "ai_context": {
+      "purpose": "Registers a client session and environment metadata with Atlassian's experimentation and telemetry platform for product tracking.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -526,7 +661,12 @@
     },
     "status": 202,
     "post_data_base64": "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",
-    "post_data_is_binary": true
+    "post_data_is_binary": true,
+    "ai_context": {
+      "purpose": "Registers a client session and sends telemetry data to Atlassian's experimentation and analytics platform.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -541,7 +681,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "This request retrieves the identification details and pending access requests for a specific Trello board.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -553,7 +698,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the classification and metadata of website cookies to facilitate privacy compliance and user consent management.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -595,7 +745,12 @@
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
       "accept": "application/json,text/plain"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the list of enabled Power-Ups (plugins) for a specific Trello board.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -635,7 +790,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Records a view event for a specific photo to track its popularity and usage statistics on Unsplash.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -803,7 +963,12 @@
       "atl-app-switcher-version": "45.0.5",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves a list of third-party products and integrations available to the user through the Trello application switcher menu.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -817,7 +982,12 @@
       "atl-app-switcher-version": "45.0.5",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the list of Atlassian products accessible to the user to populate the UI app switcher menu.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -829,7 +999,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the frontend configuration manifest for the Atlassian application switcher component to load its assets and metadata.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -841,7 +1016,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves configuration and localization data for the Atlassian product navigation menu (App Switcher).",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -855,7 +1035,12 @@
       "atl-app-switcher-version": "45.1.2",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the list of available integrated third-party products to populate Trello's application switcher navigation menu.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -869,7 +1054,12 @@
       "atl-app-switcher-version": "45.1.2",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the list of Atlassian products available to the current user for display in the application switcher menu.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -881,7 +1071,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the asset manifest required to load and render the Atlassian product navigation menu (app switcher) for the user.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -893,7 +1088,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves localized configuration and layout data for the Atlassian App Switcher navigation menu.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -919,7 +1119,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves configuration and promotional content for the Trello app switcher's discovery section to suggest related Atlassian products to the user.",
+      "category": "read",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -975,7 +1180,12 @@
       "sec-ch-ua-mobile": "?0"
     },
     "status": 200,
-    "post_data": "[{\"messageEventType\":\"viewed\",\"messageInstanceId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"messageTemplateId\":\"recommendation-jsm\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"4085b2f6-f741-4535-a5a4-987294dbae44\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"deliverySuccessful\",\"messageInstanceId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"messageTemplateId\":\"recommendation-jsm\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"4085b2f6-f741-4535-a5a4-987294dbae44\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"viewed\",\"messageInstanceId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"messageTemplateId\":\"recommendation-jpd\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"1cb75f35-9a77-4f24-a492-dad9572c06e5\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"deliverySuccessful\",\"messageInstanceId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"messageTemplateId\":\"recommendation-jpd\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"1cb75f35-9a77-4f24-a492-dad9572c06e5\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"viewed\",\"messageInstanceId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"messageTemplateId\":\"recommendation-confluence\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"42a52fab-9abd-4bb4-b02a-4aaf0bcd5445\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"deliverySuccessful\",\"messageInstanceId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"messageTemplateId\":\"recommendation-confluence\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"42a52fab-9abd-4bb4-b02a-4aaf0bcd5445\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593}]"
+    "post_data": "[{\"messageEventType\":\"viewed\",\"messageInstanceId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"messageTemplateId\":\"recommendation-jsm\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"4085b2f6-f741-4535-a5a4-987294dbae44\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"deliverySuccessful\",\"messageInstanceId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"messageTemplateId\":\"recommendation-jsm\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"4085b2f6-f741-4535-a5a4-987294dbae44\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"viewed\",\"messageInstanceId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"messageTemplateId\":\"recommendation-jpd\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"1cb75f35-9a77-4f24-a492-dad9572c06e5\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"deliverySuccessful\",\"messageInstanceId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"messageTemplateId\":\"recommendation-jpd\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"1cb75f35-9a77-4f24-a492-dad9572c06e5\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"viewed\",\"messageInstanceId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"messageTemplateId\":\"recommendation-confluence\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"42a52fab-9abd-4bb4-b02a-4aaf0bcd5445\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593},{\"messageEventType\":\"deliverySuccessful\",\"messageInstanceId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"messageTemplateId\":\"recommendation-confluence\",\"deliveryChannel\":\"in-app\",\"placementId\":\"app-switcher-discovery-section\",\"channelType\":\"pull\",\"context\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null,\"source\":\"app-switcher-discovery-section\",\"recommendation\":{\"recommendationSessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\",\"recommendationEntityId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\"}},\"additionalMetadataFromFrontend\":{\"transactionAccountId\":null},\"messageTriggerId\":\"42a52fab-9abd-4bb4-b02a-4aaf0bcd5445\",\"messageCreationType\":\"implicit\",\"timestamp\":1769939957593}]",
+    "ai_context": {
+      "purpose": "Logs an analytics event indicating the user viewed an in-app recommendation for Jira Service Management within the Trello app switcher.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "POST",
@@ -989,7 +1199,12 @@
       "sec-ch-ua-mobile": "?0"
     },
     "status": 200,
-    "post_data": "[{\"messageInstanceId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"messageTemplateId\":\"recommendation-jsm\",\"type\":\"viewed\",\"placement\":\"app-switcher-discovery-section\",\"createdAt\":1769939957592,\"context\":{\"browser\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null},\"recommendation\":{\"entityId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"sessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\"}}},{\"messageInstanceId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"messageTemplateId\":\"recommendation-jpd\",\"type\":\"viewed\",\"placement\":\"app-switcher-discovery-section\",\"createdAt\":1769939957593,\"context\":{\"browser\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null},\"recommendation\":{\"entityId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"sessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\"}}},{\"messageInstanceId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"messageTemplateId\":\"recommendation-confluence\",\"type\":\"viewed\",\"placement\":\"app-switcher-discovery-section\",\"createdAt\":1769939957593,\"context\":{\"browser\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null},\"recommendation\":{\"entityId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"sessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\"}}}]"
+    "post_data": "[{\"messageInstanceId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"messageTemplateId\":\"recommendation-jsm\",\"type\":\"viewed\",\"placement\":\"app-switcher-discovery-section\",\"createdAt\":1769939957592,\"context\":{\"browser\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null},\"recommendation\":{\"entityId\":\"f215e3ac69dd0ff0711ae7349f1ac2fe80a16394e44524b069bf437de2f72ba8\",\"sessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\"}}},{\"messageInstanceId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"messageTemplateId\":\"recommendation-jpd\",\"type\":\"viewed\",\"placement\":\"app-switcher-discovery-section\",\"createdAt\":1769939957593,\"context\":{\"browser\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null},\"recommendation\":{\"entityId\":\"73b5dd9d3f70ad5e0eec1ca448d6a471ee2842a4246a571a8b90108054890d38\",\"sessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\"}}},{\"messageInstanceId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"messageTemplateId\":\"recommendation-confluence\",\"type\":\"viewed\",\"placement\":\"app-switcher-discovery-section\",\"createdAt\":1769939957593,\"context\":{\"browser\":{\"locale\":\"en-US\",\"product\":\"trello\",\"workspaceAri\":\"no-workspace-ari-available\",\"memberId\":null,\"hasPaidWorkspace\":null,\"isWeb\":null},\"recommendation\":{\"entityId\":\"79307bd9299f26d35715962794f5e2efdf2ceab93d97bd84dc6f583f648288db\",\"sessionId\":\"8a10a23d-289e-47d7-af03-e9fc8bd124cf\"}}}]",
+    "ai_context": {
+      "purpose": "This request tracks and logs that a user has viewed a specific in-app recommendation message for Jira Service Management in the Trello app switcher.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   },
   {
     "method": "GET",
@@ -1004,7 +1219,12 @@
       "x-trello-client-version": "build-231871",
       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Retrieves the current user's membership status and available premium features for a specific Trello organization.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "GET",
@@ -1017,7 +1237,12 @@
       "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
       "sec-ch-ua-mobile": "?0"
     },
-    "status": 200
+    "status": 200,
+    "ai_context": {
+      "purpose": "Fetches a list of background images from an Unsplash collection for the user to select for Trello boards or card covers.",
+      "category": "read",
+      "useful_for_tool": true
+    }
   },
   {
     "method": "POST",
@@ -1059,6 +1284,11 @@
     },
     "status": 202,
     "post_data_base64": "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",
-    "post_data_is_binary": true
+    "post_data_is_binary": true,
+    "ai_context": {
+      "purpose": "Registers a client session and tracks telemetry data for Atlassian product usage analytics.",
+      "category": "analytics",
+      "useful_for_tool": false
+    }
   }
 ]

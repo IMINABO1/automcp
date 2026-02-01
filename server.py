@@ -2,6 +2,7 @@ from mcp.server.fastmcp import FastMCP
 import config
 import os
 import sys
+from session_utils import get_request_cookies, get_csrf_token
 
 # Initialize FastMCP
 mcp = FastMCP("AutoMCP")
@@ -10,7 +11,9 @@ mcp = FastMCP("AutoMCP")
 # We need to make sure 'mcp' is available to the executed code so @mcp.tool() works
 execution_context = {
     "mcp": mcp,
-    "httpx": None # Will be imported in generated code, but good to have
+    "httpx": None,  # Will be imported in generated code
+    "get_request_cookies": get_request_cookies,
+    "get_csrf_token": get_csrf_token,
 }
 
 @mcp.tool()
