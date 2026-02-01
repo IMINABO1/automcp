@@ -16,151 +16,160 @@ from session_utils import get_request_cookies, get_csrf_token
 
 
 
-# Tool: This request updates the server to record that the user has viewed a specific Trello board, likely for tracking recent activity or clearing notifications.
+# Tool: Retrieves configuration data that categorizes and describes various cookies for privacy compliance and consent management.
 @mcp.tool()
-async def mark_board_as_viewed(board_id: str):
+async def get_cookie_compliance_categories():
     """
-    Updates the server to record that the user has viewed a specific Trello board. 
-    This is typically used for tracking recent activity or clearing notifications related to the board.
+    Retrieves configuration data that categorizes and describes various cookies for privacy compliance and consent management.
+    This tool is used to identify how different cookies are classified (e.g., essential, performance, advertising) 
+    according to Atlassian's privacy standards.
     """
-    url = f"https://trello.com/1/boards/{board_id}/markAsViewed"
+    url = "https://atlassian-cookies--categories.us-east-1.prod.public.atl-paas.net/categories_COOKIE.json"
     cookies = get_request_cookies(url)
-    data = {"dsc": get_csrf_token()}
-    
+    headers = {
+        "referer": "https://trello.com/",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-ch-ua": '"Chromium";v="145", "Not:A-Brand";v="99"',
+        "sec-ch-ua-mobile": "?0"
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                url, 
+                cookies=cookies, 
+                headers=headers,
+                timeout=30.0
+            )
+            response.raise_for_status()
+            return response.json()
+    except httpx.HTTPStatusError as e:
+        return f"HTTP error occurred while retrieving cookie categories: {e.response.status_code} - {e.response.text}"
+    except Exception as e:
+        return f"An unexpected error occurred while retrieving cookie categories: {str(e)}"
+
+
+# Tool: Retrieves feature flag configurations and experimental toggles for the Trello web application interface.
+@mcp.tool()
+async def get_trello_feature_flags(client_sdk_key: str = "trello_web"):
+    """
+    Retrieves feature flag configurations and experimental toggles for the Trello web application interface.
+    This tool helps in identifying which experimental features are currently enabled for the user session.
+
+    Args:
+        client_sdk_key (str): The client SDK identifier, defaults to 'trello_web'.
+    """
+    url = f"https://api.atlassian.com/flags/api/v2/frontend/clientSdkKey/{client_sdk_key}"
+    cookies = get_request_cookies(url)
+    headers = {
+        "x-api-key": "1f24403e-f053-43de-b063-e20b357a8f63",
+        "x-client-version": "0.0.0-development",
+        "x-client-name": "feature-gate-js-client",
+        "content-type": "application/json"
+    }
+
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(url, cookies=cookies, data=data)
+            response = await client.get(url, headers=headers, cookies=cookies, timeout=30.0)
             response.raise_for_status()
-            try:
-                return response.json()
-            except Exception:
-                return response.text
+            return response.json()
         except httpx.HTTPStatusError as e:
-            return f"Error marking board as viewed: {e.response.text}"
+            return {
+                "error": f"HTTP error {e.response.status_code} while fetching feature flags",
+                "details": e.response.text
+            }
         except Exception as e:
-            return f"An unexpected error occurred: {str(e)}"
+            return {"error": f"Unexpected error: {str(e)}"}
 
 
-# Tool: Retrieves the current user's starred boards and basic profile metadata.
+# Tool: Fetches feature flag configurations and experiment toggles for a Trello user based on their account and device metadata.
 @mcp.tool()
-async def get_user_starred_boards():
+async def get_feature_flags(atlassian_account_id: str, namespace: str = "trello_web", is_desktop: bool = False, is_touch: bool = False, locale: str = "en-US"):
     """
-    Retrieves the current user's starred boards and basic profile metadata from Trello.
-    
-    This tool uses the Trello GraphQL gateway to fetch the authenticated user's starred boards, 
-    board IDs, positions, and basic profile information like username and object ID.
+    Fetches feature flag configurations and experiment toggles for a Trello user based on their Atlassian account and device metadata.
+
+    Args:
+        atlassian_account_id: The user's Atlassian account ID.
+        namespace: The configuration namespace (e.g., 'trello_web').
+        is_desktop: Whether the request is coming from a desktop environment.
+        is_touch: Whether the request is coming from a touch-enabled device.
+        locale: The locale of the user (e.g., 'en-US').
     """
-    url = "https://trello.com/gateway/api/graphql?operationName=quickload:TrelloMemberBoards"
+    url = "https://api.atlassian.com/flags/api/v2/configurations"
     cookies = get_request_cookies(url)
     
     payload = {
-        "query": "query TrelloMemberBoards{trello{__typename me@optIn(to:\"TrelloMe\"){id __typename boardStars{__typename edges{id __typename boardObjectId objectId position}}objectId username}}}",
-        "variables": {},
-        "operationName": "TrelloMemberBoards",
+        "namespace": namespace,
+        "identifiers": {
+            "atlassianAccountId": atlassian_account_id
+        },
+        "metadata": {
+            "isDesktop": is_desktop,
+            "isTouch": is_touch,
+            "locale": locale
+        },
+        "dsc": get_csrf_token()
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            # We use json=payload to ensure the correct Content-Type header and JSON encoding
+            response = await client.post(url, json=payload, cookies=cookies)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            return {"error": f"HTTP error {e.response.status_code}: {e.response.text}"}
+        except Exception as e:
+            return {"error": str(e)}
+
+
+# Tool: Retrieves the structural data of a specific Trello board, including its lists and all associated cards with their labels.
+@mcp.tool()
+async def get_board_structure(board_short_link: str):
+    """
+    Retrieves the structural data of a specific Trello board, including its lists and all associated cards with their labels.
+
+    Args:
+        board_short_link: The short link (ID) of the board (e.g., 'a7UxwGZY').
+    """
+    url = "https://trello.com/gateway/api/graphql?operationName=quickload:TrelloCurrentBoardListsCards"
+    cookies = get_request_cookies(url)
+    
+    query = "query TrelloCurrentBoardListsCards($id:TrelloShortLink!){trello{__typename boardByShortLink(shortLink:$id)@optIn(to:\"TrelloBoard\"){id __typename lists(first:-1){__typename edges{__typename node{id __typename cards(first:-1)@optIn(to:\"TrelloListCards\"){__typename edges{__typename node{id __typename closed labels(first:-1){__typename edges{__typename node{id __typename color name objectId}}}objectId...on TrelloCard{isTemplate}}}}}}}}}}"
+    
+    payload = {
+        "query": query,
+        "variables": {"id": board_short_link},
+        "operationName": "TrelloCurrentBoardListsCards",
         "dsc": get_csrf_token()
     }
     
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "origin": "https://trello.com",
-        "referer": "https://trello.com/",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+        "x-trello-operation-name": "quickload:TrelloCurrentBoardListsCards",
+        "x-trello-operation-source": "quickload"
     }
 
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                url,
-                cookies=cookies,
-                json=payload,
-                headers=headers
+                url, 
+                json=payload, 
+                cookies=cookies, 
+                headers=headers,
+                timeout=30.0
             )
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            return {"error": f"HTTP error occurred: {e.response.status_code}", "detail": e.response.text}
+            return {"error": f"HTTP error {e.response.status_code}", "message": e.response.text}
         except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
+            return {"error": "Internal Error", "message": str(e)}
 
 
-# Tool: Retrieves the comprehensive content of a Trello board, including its lists and detailed card data, to populate the user's current board view.
-@mcp.tool()
-async def get_board_content(board_id: str):
-    """
-    Retrieves the comprehensive content of a Trello board, including its lists and detailed card data, 
-    to populate the user's current board view.
-
-    Args:
-        board_id: The ID or shortLink of the Trello board (e.g., 'a7UxwGZY').
-    """
-    url = f"https://trello.com/1/board/{board_id}"
-    params = {
-        "fields": "id",
-        "cards": "visible",
-        "card_fields": "id,address,agent,badges,cardRole,closed,coordinates,cover,creationMethod,creationMethodError,creationMethodLoadingStartedAt,dateLastActivity,desc,descData,due,dueComplete,dueReminder,faviconUrl,idAttachmentCover,idBoard,idLabels,idList,idMembers,idShort,isTemplate,labels,limits,locationName,mirrorSourceId,name,nodeId,originalDesc,originalName,pinned,pos,recurrenceRule,shortLink,shortUrl,singleInstrumentationId,start,subscribed,url,urlSource,urlSourceText",
-        "card_attachments": "true",
-        "card_attachment_fields": "id,bytes,date,edgeColor,fileName,idMember,isMalicious,isUpload,mimeType,name,pos,url",
-        "card_checklists": "all",
-        "card_checklist_fields": "id,idBoard,idCard,name,pos",
-        "card_checklist_checkItems": "none",
-        "card_customFieldItems": "true",
-        "card_pluginData": "true",
-        "card_stickers": "true",
-        "lists": "open",
-        "list_fields": "id,closed,color,creationMethod,datasource,idBoard,limits,name,nodeId,pos,softLimit,subscribed,type",
-        "operationName": "quickload:CurrentBoardListsCards"
-    }
-    
-    headers = {
-        "x-trello-operation-name": "quickload:CurrentBoardListsCards",
-        "x-trello-operation-source": "quickload",
-        "accept": "application/json,text/plain"
-    }
-    
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, params=params, headers=headers, cookies=cookies, timeout=30.0)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return f"HTTP error occurred: {e.response.status_code} - {e.response.text}"
-        except Exception as e:
-            return f"An unexpected error occurred: {str(e)}"
-
-
-# Tool: Retrieves the classification data used to map browser cookies to privacy categories like essential or analytics for Atlassian services.
-@mcp.tool()
-async def get_atlassian_cookie_categories():
-    """
-    Retrieves the classification data used to map browser cookies to privacy categories 
-    like essential or analytics for Atlassian services. This data maps cookie identifiers 
-    to their respective privacy classifications.
-    """
-    url = "https://atlassian-cookies--categories.us-east-1.prod.public.atl-paas.net/categories_COOKIE.json"
-    headers = {
-        "sec-ch-ua-platform": "\"Windows\"",
-        "referer": "https://trello.com/",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
-        "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"",
-        "sec-ch-ua-mobile": "?0"
-    }
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, headers=headers, cookies=cookies)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPError as e:
-            return f"HTTP error occurred while retrieving cookie categories: {str(e)}"
-        except Exception as e:
-            return f"An unexpected error occurred: {str(e)}"
-
-
-# Tool: Retrieves feature flag and A/B experiment configurations tailored to the user's account attributes and device context.
+# Tool: Retrieves feature flag and A/B test variations tailored to the user's account attributes and session context.
 @mcp.tool()
 async def get_experiment_values(
     atlassian_account_id: str,
@@ -169,26 +178,27 @@ async def get_experiment_values(
     custom_attributes: dict = None
 ):
     """
-    Retrieves feature flag and A/B experiment configurations tailored to the user's account attributes and device context.
+    Retrieves feature flag and A/B test variations tailored to the user's account attributes and session context.
 
     Args:
-        atlassian_account_id: The Atlassian account identifier for the user.
-        analytics_anonymous_id: The anonymous identifier used for analytics tracking.
-        target_app: The application identifier, such as 'trello_web'.
-        custom_attributes: Dictionary containing context attributes like locale, signup date, and subscription status.
+        atlassian_account_id: The Atlassian account ID of the user.
+        analytics_anonymous_id: The anonymous analytics identifier.
+        target_app: The application identifier (e.g., 'trello_web').
+        custom_attributes: A dictionary containing user context such as locale, enterprise status, or cohort information.
     """
     url = "https://api.atlassian.com/flags/api/v2/frontend/experimentValues"
     cookies = get_request_cookies(url)
-
+    
     headers = {
+        "sec-ch-ua-platform": '"macOS"',
+        "referer": "https://trello.com/",
         "x-api-key": "1f24403e-f053-43de-b063-e20b357a8f63",
-        "x-client-name": "feature-gate-js-client",
         "x-client-version": "0.0.0-development",
-        "content-type": "application/json",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
-        "referer": "https://trello.com/"
+        "x-client-name": "feature-gate-js-client",
+        "content-type": "application/json"
     }
 
+    # Prepare payload with identifiers and custom attributes
     payload = {
         "identifiers": {
             "atlassianAccountId": atlassian_account_id,
@@ -202,272 +212,11 @@ async def get_experiment_values(
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                url,
-                json=payload,
-                headers=headers,
-                cookies=cookies,
-                timeout=30.0
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {
-                "error": f"HTTP error occurred: {e.response.status_code}",
-                "response": e.response.text
-            }
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: Retrieves feature flag configurations and UI toggles for a Trello user based on their account metadata and subscription status.
-@mcp.tool()
-async def get_feature_flag_configurations(
-    atlassian_account_id: str,
-    id_orgs: list = None,
-    premium_features: list = None,
-    namespace: str = "trello_web",
-    locale: str = "en-US"
-):
-    """
-    Retrieves feature flag configurations and UI toggles for a Trello user based on their account metadata and subscription status.
-    This tool helps determine which features (like AI Quick Capture, Advanced Checklists, or Workspace Views) are enabled for a specific account.
-    """
-    url = "https://api.atlassian.com/flags/api/v2/configurations"
-    cookies = get_request_cookies(url)
-    
-    headers = {
-        "content-type": "application/json",
-        "x-api-key": "1f24403e-f053-43de-b063-e20b357a8f63",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
-        "referer": "https://trello.com/"
-    }
-    
-    # Construct the payload based on the recorded request structure
-    payload = {
-        "namespace": namespace,
-        "identifiers": {
-            "atlassianAccountId": atlassian_account_id
-        },
-        "metadata": {
-            "isDesktop": False,
-            "isTouch": False,
-            "locale": locale,
-            "idOrgs": id_orgs if id_orgs is not None else [],
-            "premiumFeatures": premium_features if premium_features is not None else [
-                "activity", "additionalBoardBackgrounds", "additionalStickers", "advancedChecklists",
-                "aiQuickCapture", "atlassianIntelligence", "boardExport", "butlerBC", "butlerPremium",
-                "collapsibleLists", "csvExport", "customBoardBackgrounds", "customEmoji", "customStickers",
-                "export", "goldMembers", "inviteBoard", "inviteOrg", "isBc", "isPremium", "largeAttachments",
-                "listColors", "multiBoardGuests", "observers", "paidCorePlugins", "plugins", 
-                "premiumMirrorCards", "privateTemplates", "readSecrets", "restrictVis", "savedSearches",
-                "starCounts", "superAdmins", "tags", "views", "workspaceViews"
-            ],
-            "products": [110],
-            "version": 231871
-        },
-        "dsc": get_csrf_token()
-    }
-
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(
-                url,
-                headers=headers,
-                cookies=cookies,
-                json=payload,
-                timeout=30.0
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {
-                "error": f"HTTP error occurred: {e.response.status_code}",
-                "details": e.response.text
-            }
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: Retrieves the ID and enabled plugin configuration for a specific Trello board.
-@mcp.tool()
-async def get_board_plugin_configuration(board_id: str):
-    """
-    Retrieves the ID and enabled plugin configuration for a specific Trello board.
-    This tool allows you to see which Power-Ups or external plugins are currently enabled on a board.
-
-    Args:
-        board_id: The unique identifier (ID) of the Trello board.
-    """
-    url = f"https://trello.com/1/board/{board_id}"
-    params = {
-        "fields": "id",
-        "boardPlugins": "true",
-        "plugins": "enabled"
-    }
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(
                 url, 
-                params=params, 
+                headers=headers, 
+                json=payload, 
                 cookies=cookies,
                 timeout=30.0
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {"error": f"HTTP error occurred: {e.response.status_code} - {e.response.text}"}
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: Retrieves billing details, member counts, and subscription type for a specific Trello organization workspace.
-@mcp.tool()
-async def get_organization_billing_data(organization_id: str):
-    """
-    Retrieves billing details, member counts, and subscription type for a specific Trello organization workspace.
-    
-    Args:
-        organization_id (str): The unique ID of the Trello organization/workspace.
-    """
-    url = f"https://trello.com/1/organization/{organization_id}"
-    params = {
-        "fields": "id,billableMemberCount,offering,teamType"
-    }
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, params=params, cookies=cookies)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {"error": f"HTTP error occurred: {e.response.status_code}", "detail": e.response.text}
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: Retrieves the count of unread notifications for the currently logged-in user.
-@mcp.tool()
-async def get_notifications_count(grouped: bool = True, filter: str = "all"):
-    """
-    Retrieves the count of unread notifications for the currently logged-in user.
-
-    Args:
-        grouped: Whether to return grouped notification counts.
-        filter: Filter for notifications (e.g., 'all').
-    """
-    url = "https://trello.com/1/members/me/notificationsCount"
-    params = {
-        "grouped": str(grouped).lower(),
-        "filter": filter
-    }
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, params=params, cookies=cookies)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {"error": f"HTTP error occurred: {e.response.status_code} - {e.response.text}"}
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: This request retrieves the current user's unread notifications grouped by context, including detailed metadata for the associated Trello cards and boards.
-@mcp.tool()
-async def get_unread_notification_groups(limit: int = 10, skip: int = 0, read_filter: str = "unread"):
-    """
-    Retrieves the current user's unread notifications grouped by context, including detailed metadata for the associated Trello cards and boards.
-
-    Args:
-        limit (int): The number of notification groups to retrieve. Defaults to 10.
-        skip (int): The number of notification groups to skip. Defaults to 0.
-        read_filter (str): Filter for notifications by read status (e.g., 'unread', 'all', 'read'). Defaults to 'unread'.
-    """
-    url = "https://trello.com/1/members/me/notificationGroups"
-    params = {
-        "limit": limit,
-        "skip": skip,
-        "read_filter": read_filter,
-        "card_fields": "id,badges,cardRole,checkItemStates,closed,cover,dateLastActivity,desc,descData,due,dueComplete,dueReminder,email,idAttachmentCover,idBoard,idChecklists,idLabels,idList,idMembers,idMembersVoted,idShort,isTemplate,manualCoverAttachment,name,pos,shortLink,shortUrl,start,subscribed,url",
-        "card_board_fields": "id,name,prefs,subscribed,url"
-    }
-    headers = {
-        "x-trello-operation-name": "UnreadNotificationGroups",
-        "x-trello-operation-source": "graphql",
-        "content-type": "application/json"
-    }
-    cookies = get_request_cookies(url)
-
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, params=params, headers=headers, cookies=cookies)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {
-                "error": f"HTTP error {e.response.status_code} retrieving notifications",
-                "details": e.response.text
-            }
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: Retrieves a Trello member's profile details and licensing/subscription status for all organizations they belong to.
-@mcp.tool()
-async def get_member_organization_details(member_id: str):
-    """
-    Retrieves a Trello member's profile details and licensing/subscription status for all organizations they belong to.
-
-    Args:
-        member_id: The ID or username of the Trello member (use 'me' for the current authenticated user).
-    """
-    url = f"https://trello.com/1/member/{member_id}"
-    params = {
-        "fields": "id,idPremOrgsAdmin",
-        "organizations": "all",
-        "organization_fields": "id,availableLicenseCount,displayName,idEnterprise,maximumLicenseCount,offering,premiumFeatures"
-    }
-    
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, params=params, cookies=cookies)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {"error": f"HTTP error occurred: {e.response.status_code} - {e.response.text}"}
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
-
-
-# Tool: Retrieves the list of enabled Power-Ups (plugins) for a specific Trello board.
-@mcp.tool()
-async def get_board_enabled_plugins(board_id: str):
-    """
-    Retrieves the list of enabled Power-Ups (plugins) for a specific Trello board.
-
-    Args:
-        board_id (str): The ID of the board to retrieve enabled plugins for.
-    """
-    url = f"https://trello.com/1/boards/{board_id}/plugins"
-    params = {
-        "filter": "enabled",
-        "operationName": "load:Plugin"
-    }
-    cookies = get_request_cookies(url)
-    
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(
-                url, 
-                params=params, 
-                cookies=cookies,
-                headers={"accept": "application/json"}
             )
             response.raise_for_status()
             return response.json()
@@ -477,18 +226,240 @@ async def get_board_enabled_plugins(board_id: str):
             return {"error": f"An unexpected error occurred: {str(e)}"}
 
 
-# Tool: Fetches a list of background images from an Unsplash collection for the user to select for Trello boards or card covers.
+# Tool: Retrieves the count of unread notifications for the current user to display in the interface.
 @mcp.tool()
-async def get_unsplash_collection_photos(collection_id: str = "317099", per_page: int = 30, order_by: str = "latest", page: int = 1):
+async def get_notifications_count(grouped: bool = True, notification_filter: str = "all"):
     """
-    Fetches a list of background images from a specific Unsplash collection via Trello's proxy.
-    This tool is useful for retrieving high-quality images to be used as Trello board backgrounds or card covers.
+    Retrieves the count of unread notifications for the current user to display in the interface.
 
     Args:
-        collection_id: The ID of the Unsplash collection to fetch photos from.
-        per_page: The number of photos to return per page (default 30).
-        order_by: The sort order of the results, such as 'latest', 'oldest', or 'popular'.
-        page: The page number of the results to retrieve.
+        grouped (bool): Whether to group the notification counts.
+        notification_filter (str): Filter for the notifications, such as 'all'.
+    """
+    url = "https://trello.com/1/members/me/notificationsCount"
+    params = {
+        "grouped": str(grouped).lower(),
+        "filter": notification_filter
+    }
+    cookies = get_request_cookies(url)
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, params=params, cookies=cookies)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            return f"Error fetching notification count: {e.response.status_code} - {e.response.text}"
+        except Exception as e:
+            return f"An unexpected error occurred: {str(e)}"
+
+
+# Tool: Retrieves a paginated list of the user's unread notifications along with detailed metadata for the associated cards and boards.
+@mcp.tool()
+async def get_unread_notification_groups(limit: int = 10, skip: int = 0, read_filter: str = "unread"):
+    """
+    Retrieves a paginated list of the user's unread notifications along with detailed metadata for the associated cards and boards.
+
+    Args:
+        limit: The number of notification groups to retrieve (default: 10).
+        skip: The number of notification groups to skip for pagination (default: 0).
+        read_filter: Filter for notifications by read status (default: 'unread').
+    """
+    url = "https://trello.com/1/members/me/notificationGroups"
+    params = {
+        "limit": limit,
+        "skip": skip,
+        "read_filter": read_filter,
+        "card_fields": "id,badges,cardRole,checkItemStates,closed,cover,dateLastActivity,desc,descData,due,dueComplete,dueReminder,email,idAttachmentCover,idBoard,idChecklists,idLabels,idList,idMembers,idMembersVoted,idShort,isTemplate,manualCoverAttachment,name,pos,shortLink,shortUrl,start,subscribed,url",
+        "card_board_fields": "id,name,prefs,subscribed,url"
+    }
+    
+    cookies = get_request_cookies(url)
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                url, 
+                params=params, 
+                cookies=cookies,
+                headers={"content-type": "application/json"}
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            return {"error": f"HTTP error occurred: {e.response.status_code}", "detail": e.response.text}
+        except Exception as e:
+            return {"error": f"An unexpected error occurred: {str(e)}"}
+
+
+# Tool: Retrieves a Trello member's profile data and detailed licensing/subscription information for all their associated organizations.
+@mcp.tool()
+async def get_member_organizations(member_id: str):
+    """
+    Retrieves a Trello member's profile data and detailed licensing/subscription information for all their associated organizations.
+
+    Args:
+        member_id: The unique ID or username of the Trello member.
+    """
+    url = f"https://trello.com/1/member/{member_id}"
+    params = {
+        "fields": "id,idPremOrgsAdmin",
+        "organizations": "all",
+        "organization_fields": "id,availableLicenseCount,displayName,idEnterprise,maximumLicenseCount,offering,premiumFeatures"
+    }
+    cookies = get_request_cookies(url)
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, params=params, cookies=cookies)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            return f"Error fetching member organization data: {e.response.text}"
+        except Exception as e:
+            return f"An unexpected error occurred: {str(e)}"
+
+
+# Tool: Retrieves detailed metadata, member information, and subscription status for a specific Trello workspace.
+@mcp.tool()
+async def get_workspace_details(workspace_id: str):
+    """
+    Retrieves detailed metadata, member information, and subscription status for a specific Trello workspace.
+
+    Args:
+        workspace_id: The ID or name of the Trello workspace to retrieve details for.
+    """
+    url = f"https://trello.com/1/organization/{workspace_id}"
+    params = {
+        "fields": "id,desc,displayName,idEnterprise,idEntitlement,memberships,name,offering,prefs,premiumFeatures,website",
+        "enterprise": "true",
+        "members": "all",
+        "member_fields": "id,fullName,memberType,nonPublic",
+        "paidAccount": "true",
+        "paidAccount_fields": "standing"
+    }
+    cookies = get_request_cookies(url)
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, params=params, cookies=cookies)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            return {"error": f"HTTP error occurred: {e.response.status_code}", "details": e.response.text}
+        except Exception as e:
+            return {"error": f"An unexpected error occurred: {str(e)}"}
+
+
+# Tool: Initiates or checks a request for the user to gain permission to access a specific Trello board.
+@mcp.tool()
+async def request_board_access(board_id: str):
+    """
+    Initiates or checks a request for the user to gain permission to access a specific Trello board.
+
+    Args:
+        board_id (str): The unique identifier or short link of the Trello board.
+    """
+    url = f"https://trello.com/1/board/{board_id}/requestAccess"
+    cookies = get_request_cookies(url)
+    headers = {
+        "x-trello-operation-name": "RequestAccessPage",
+        "x-trello-operation-source": "graphql",
+        "referer": f"https://trello.com/b/{board_id}/testboard"
+    }
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, cookies=cookies, headers=headers)
+            response.raise_for_status()
+            try:
+                return response.json()
+            except ValueError:
+                return response.text
+        except httpx.HTTPStatusError as e:
+            return {"error": f"HTTP {e.response.status_code}", "message": e.response.text}
+        except Exception as e:
+            return {"error": "Internal Error", "message": str(e)}
+
+
+# Tool: Registers a client-side session or user interaction event for Atlassian product analytics.
+@mcp.tool()
+async def register_atlassian_analytics_session(
+    client_key: str,
+    source_type: str = "javascript-client",
+    source_version: str = "3.26.0",
+    timestamp: str = "1769957265379",
+    session_id: str = "7c520333-2327-4860-b530-df00e29e29c8",
+    event_count: str = "102",
+    is_gzipped: str = "1"
+):
+    """
+    Registers a client-side session or user interaction event for Atlassian product analytics.
+    
+    This tool is used to log telemetry data and track user engagement sessions within Atlassian products.
+    It captures metadata about the client environment, session identifiers, and event sequencing.
+
+    Args:
+        client_key: The specific client identifier used for analytics tracking (k).
+        source_type: The platform or environment sending the analytics (st).
+        source_version: The version of the analytics client library (sv).
+        timestamp: The timestamp of the registration event (t).
+        session_id: A unique identifier for the current user session (sid).
+        event_count: The incremental count of events recorded in the session (ec).
+        is_gzipped: Indicates if the data payload is compressed (gz).
+    """
+    url = "https://xp.atlassian.com/v1/rgstr"
+    params = {
+        "k": client_key,
+        "st": source_type,
+        "sv": source_version,
+        "t": timestamp,
+        "sid": session_id,
+        "ec": event_count,
+        "gz": is_gzipped
+    }
+    
+    cookies = get_request_cookies(url)
+    # Include CSRF token as required for POST requests
+    data = {"dsc": get_csrf_token()}
+    
+    headers = {
+        "sec-ch-ua-platform": "\"macOS\"",
+        "referer": "https://trello.com/",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                url, 
+                params=params, 
+                cookies=cookies, 
+                data=data, 
+                headers=headers,
+                timeout=30.0
+            )
+            response.raise_for_status()
+            try:
+                return response.json()
+            except Exception:
+                return response.text
+        except httpx.HTTPStatusError as e:
+            return {"error": f"HTTP error occurred: {e.response.status_code}", "details": e.response.text}
+        except Exception as e:
+            return {"error": f"An unexpected error occurred: {str(e)}"}
+
+
+# Tool: Retrieves a list of stock photos from an Unsplash collection for the user to select as a Trello board background.
+@mcp.tool()
+async def get_unsplash_collection_photos(collection_id: str, per_page: int = 30, order_by: str = "latest", page: int = 1):
+    """
+    Retrieves a list of stock photos from an Unsplash collection for the user to select as a Trello board background.
+
+    Args:
+        collection_id: The unique identifier for the Unsplash collection (e.g., '317099').
+        per_page: Number of photos to retrieve per page (default 30).
+        order_by: How to sort the results, such as 'latest'.
+        page: The page number for pagination.
     """
     url = f"https://trello.com/proxy/unsplash/collections/{collection_id}/photos"
     params = {
@@ -497,8 +468,7 @@ async def get_unsplash_collection_photos(collection_id: str = "317099", per_page
         "page": page
     }
     headers = {
-        "accept-version": "v1",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+        "accept-version": "v1"
     }
     cookies = get_request_cookies(url)
 
@@ -514,68 +484,6 @@ async def get_unsplash_collection_photos(collection_id: str = "317099", per_page
             response.raise_for_status()
             return response.json()
     except httpx.HTTPStatusError as e:
-        return {"error": f"HTTP {e.response.status_code}", "message": e.response.text}
+        return {"error": f"HTTP error {e.response.status_code}: {e.response.text}"}
     except Exception as e:
-        return {"error": "Request failed", "message": str(e)}
-
-
-# Tool: Creates a new card in a Trello list.
-@mcp.tool()
-async def create_card(
-    list_id: str,
-    name: str,
-    desc: str = "",
-    pos: str = "bottom",
-    due: str = None,
-    start: str = None,
-    id_labels: str = None,
-    id_members: str = None
-):
-    """
-    Creates a new card in a Trello list.
-
-    Args:
-        list_id: The ID of the list to add the card to.
-        name: The name/title of the card.
-        desc: Optional description for the card.
-        pos: Position of the card in the list ('top', 'bottom', or a positive number).
-        due: Optional due date in ISO format (e.g., '2024-12-31T23:59:00.000Z').
-        start: Optional start date in ISO format.
-        id_labels: Comma-separated list of label IDs to add to the card.
-        id_members: Comma-separated list of member IDs to assign to the card.
-    """
-    url = "https://trello.com/1/cards"
-    cookies = get_request_cookies(url)
-
-    data = {
-        "idList": list_id,
-        "name": name,
-        "desc": desc,
-        "pos": pos,
-        "dsc": get_csrf_token()
-    }
-
-    if due:
-        data["due"] = due
-    if start:
-        data["start"] = start
-    if id_labels:
-        data["idLabels"] = id_labels
-    if id_members:
-        data["idMembers"] = id_members
-
-    headers = {
-        "origin": "https://trello.com",
-        "referer": "https://trello.com/",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
-    }
-
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(url, data=data, cookies=cookies, headers=headers)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {"error": f"HTTP error occurred: {e.response.status_code}", "details": e.response.text}
-        except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
+        return {"error": f"An unexpected error occurred: {str(e)}"}

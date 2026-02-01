@@ -7,3 +7,6 @@ venv
 cookies_template.json
 gen_log.txt
 session.json
+session.json
+session_backup.json
+cookies.json
