@@ -1,4 +1,4 @@
-# 🚀 Project Blueprint: AutoMCP (Powered by IBM watsonx Orchestrate)
+# Project Blueprint: AutoMCP (Powered by IBM watsonx Orchestrate)
 
 **Event:** IBM Dev Day: AI Demystified Hackathon
 

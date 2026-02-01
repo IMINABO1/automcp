@@ -10,7 +10,7 @@ _credentials = Credentials(
 )
 
 _params = {
-    GenParams.MAX_NEW_TOKENS: 500
+    GenParams.MAX_NEW_TOKENS: 2000
 }
 
 _model = ModelInference(
